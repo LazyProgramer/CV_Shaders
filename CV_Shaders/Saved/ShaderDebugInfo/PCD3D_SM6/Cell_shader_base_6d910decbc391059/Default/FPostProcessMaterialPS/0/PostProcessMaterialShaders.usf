@@ -2045,9 +2045,9 @@ static const struct
 #line 3 "/Engine/Generated/UniformBuffers/Material.ush"
 cbuffer  UniformBufferConstants_Material 
 {
-	 float4  Material_PreshaderBuffer[2];
+	 float4  Material_PreshaderBuffer[3];
 	 uint BindlessSampler_Material_Wrap_WorldGroupSettings ;
-	 uint  PrePadding_Material_36;
+	 uint  PrePadding_Material_52;
 	 uint BindlessSampler_Material_Clamp_WorldGroupSettings ;
 }
 
@@ -2060,7 +2060,7 @@ SamplerState  Material_Clamp_WorldGroupSettings;
 #line 12 "/Engine/Generated/UniformBuffers/Material.ush"
 static const struct
 {
-	 float4  PreshaderBuffer[2];
+	 float4  PreshaderBuffer[3];
 	SamplerState Wrap_WorldGroupSettings;
 	SamplerState Clamp_WorldGroupSettings;
 } Material = {Material_PreshaderBuffer,Material_Wrap_WorldGroupSettings,Material_Clamp_WorldGroupSettings,};
@@ -4184,9 +4184,12 @@ void CalcPixelMaterialInputs(in out FMaterialPixelParameters Parameters, in out 
 	float4 Local21 =  select_internal( (Local6 >= 0.01000000) , Local20 , float4(0.00000000,0.00000000,0.00000000,0.00000000) );
 	float Local22 = dot(Local21.xyz,float3(0.30000001,0.58999997,0.11000000));
 	float4 Local23 =  select_internal( (Local0.rgba.rg >= Local1.rgba.rg) , (float4(View.OneOverPreExposure.xxx, 1) * Local2).rgba , Local22 );
-	float3 Local24 = lerp(Local23.xyz,Material.PreshaderBuffer[1].yzw,Material.PreshaderBuffer[1].x);
+	float Local24 = CalcSceneDepth(ScreenAlignedPosition(GetScreenPosition(Parameters)));
+	float Local25 = step(Material.PreshaderBuffer[1].x,Local24.r);
+	float4 Local26 = lerp(Local23,(float4(View.OneOverPreExposure.xxx, 1) * Local2).rgba,Local25);
+	float3 Local27 = lerp(Local26.xyz,Material.PreshaderBuffer[2].xyz,Material.PreshaderBuffer[1].y);
 
-	PixelMaterialInputs.EmissiveColor = Local24;
+	PixelMaterialInputs.EmissiveColor = Local27;
 	PixelMaterialInputs.Opacity = 1.00000000;
 	PixelMaterialInputs.OpacityMask = 1.00000000;
 	PixelMaterialInputs.BaseColor = float3(0.00000000,0.00000000,0.00000000);
@@ -4213,13 +4216,13 @@ void CalcPixelMaterialInputs(in out FMaterialPixelParameters Parameters, in out 
 
 }
 
-#line 3743 "/Engine/Generated/Material.ush"
+#line 3749 "/Engine/Generated/Material.ush"
 bool IsOrthoProjection(ViewState InView)
 {
 	return InView.ViewToClip[3][3] >= 1.0f;
 }
 
-#line 3749 "/Engine/Generated/Material.ush"
+#line 3755 "/Engine/Generated/Material.ush"
 void CalcMaterialParametersEx(
 	in out FMaterialPixelParameters Parameters,
 	in out FPixelMaterialInputs PixelMaterialInputs,
@@ -4301,7 +4304,7 @@ void CalcMaterialParametersEx(
 	}
 }
 
-#line 3844 "/Engine/Generated/Material.ush"
+#line 3850 "/Engine/Generated/Material.ush"
 void CalcMaterialParametersPost(
 	in out FMaterialPixelParameters Parameters,
 	in out FPixelMaterialInputs PixelMaterialInputs,
@@ -4399,7 +4402,7 @@ Atmosphere, 11534592
 BlueNoise, 3473677
 OpaqueBasePass, 159911720
 BasePass, 148439296
-Material, 3670272
+Material, 4718848
 NULL, 0
 View_MaterialTextureBilinearWrapedSampler, View, 8, 0
 View_MaterialTextureBilinearClampedSampler, View, 8, 1
